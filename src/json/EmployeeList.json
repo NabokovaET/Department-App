@@ -1,0 +1,49 @@
+{
+    "list": [
+        {
+            "id": "1",
+            "firstName": "Артём",
+            "lastName": "Лакидза",
+            "email": "artem@icloud.com",
+            "age": "22",
+            "position": "Team Leader",
+            "department": "IT"
+        },
+        {
+            "id": "2",
+            "firstName": "Хельга",
+            "lastName": "Набокова",
+            "email": "helga@icloud.com",
+            "age": "26",
+            "position": "Frontend Devoloper",
+            "department": "IT"
+        },
+        {
+            "id": "3",
+            "firstName": "Денис",
+            "lastName": "",
+            "email": "denis@icloud.com",
+            "age": "24",
+            "position": "PM",
+            "department": "PM"
+        },
+        {
+            "id": "4",
+            "firstName": "Даша",
+            "lastName": "",
+            "email": "dasha@icloud.com",
+            "age": "24",
+            "position": "HR",
+            "department": "HR"
+        },
+        {
+            "id": "5",
+            "firstName": "Константин",
+            "lastName": "",
+            "email": "kostiya@icloud.com",
+            "age": "35",
+            "position": "Backend Devoloper",
+            "department": "IT"
+        }
+    ]
+}

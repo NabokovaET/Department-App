@@ -1,13 +1,36 @@
 import React from 'react';
-import { Link } from "react-router-dom";
 import './Department.scss';
-import UserDepartment from "../../components/UserDeprtment/UserDepartment"
+import EmployeeList from '../../components/EmployeeList/EmployeeList';
+import data from "../../json/EmployeeList.json";
+import { Fab } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const Department = () => {
+
+  const list: any = data.list;
+  const departmentName = "IT отдел";
+
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: '#F35F51',
+      },
+    }
+  });
+
   return (
-    <div className="Department">
-        <UserDepartment/>
-    </div>
+    <ThemeProvider theme={theme}>
+      <div className="Department">
+        <div className="Department__header">
+          <h1>{departmentName}</h1>
+          <Fab size="medium" color="primary" aria-label="add">
+            <AddIcon />
+          </Fab>
+        </div>
+        <EmployeeList list={list}/>
+      </div>
+    </ThemeProvider>
   );
 }
 

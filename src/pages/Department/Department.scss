@@ -1,3 +1,9 @@
 .Department {
-
+    &__header {
+        display: flex;
+        align-items: center;
+        h1 {
+            margin-right: 2rem;
+        }
+    }
 }
