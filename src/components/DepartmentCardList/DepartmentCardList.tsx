@@ -4,34 +4,33 @@ import './DepartmentCardList.scss';
 import DepartmentCard from '../DepartmentCard/DepartmentCard';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { DepartmentInterface } from '../../interfaces/interfaces';
-import { useMutation } from "@apollo/client";
-import { ADD_DEPARTMENT } from "../../graphql/Mutation/Mutation"
+import { useMutation, useQuery } from "@apollo/client";
+import { GET_DEPARTMENT_LIST } from "../../graphql/Queries/Queries"
+import { ADD_DEPARTMENT, DELETE_DEPARTMENT } from "../../graphql/Mutation/Mutation"
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#EFEFEF',
-    },
-    secondary: {
-      main: '#243A7E',
-    },
-  }
-});
 
-const DepartmentCardList = ({list, add} : {list: DepartmentInterface[], add: boolean}) => {
+const DepartmentCardList = ({add, addDepartmentCard} : {add: boolean, addDepartmentCard: Function}) => {
 
-  const [listDepartment, setlistDepartmentt] = useState(list);
+  const { data, refetch } = useQuery(GET_DEPARTMENT_LIST);
+  const [listDepartment, setlistDepartmentt] = useState<DepartmentInterface[]>([]);
   const [formValue, setFormValue] = useState({departmentName: '', description: ''});
-  const [ addDepartment, { data } ] = useMutation(ADD_DEPARTMENT);
+  const [ addDepartment, { data: newData } ] = useMutation(ADD_DEPARTMENT);
+  const [ deleteDepartment, { data: deleteData } ] = useMutation(DELETE_DEPARTMENT);
 
   console.log(listDepartment)
 
-  useEffect(() => {
+  useEffect(()=> {
     if(data) {
-      setlistDepartmentt(data);
-
+      setlistDepartmentt(data.departments);
     }
-  }, data);
+    if(newData) {
+      refetch();
+    }
+    if(deleteData) {
+      refetch();
+    }
+  })
+
 
   const handleChange = (e: any) => {
     setFormValue({
@@ -47,11 +46,12 @@ const DepartmentCardList = ({list, add} : {list: DepartmentInterface[], add: boo
       addDepartment({ 
         variables: { 
           input: { 
-            name: formValue.departmentName, 
+            title: formValue.departmentName, 
             description: formValue.description 
           }, 
         }
-    });
+      });
+      addDepartmentCard();
     }
   }
 
@@ -60,6 +60,7 @@ const DepartmentCardList = ({list, add} : {list: DepartmentInterface[], add: boo
       <DepartmentCard
         key={item.id}
         item={item}
+        deleteDepartment={deleteDepartment}
       />
     )
   })
@@ -74,7 +75,7 @@ const DepartmentCardList = ({list, add} : {list: DepartmentInterface[], add: boo
                   <li className="DepartmentCard">
                     <Box sx={styleBox}>
                       <form onSubmit={handleSubmit}>
-                        <Grid container direction='column'rowSpacing={3} >
+                        <Grid container direction='column' rowSpacing={3} >
                           <Grid item xs={12}>
                             <Input 
                               name='departmentName'
@@ -142,3 +143,14 @@ const styleBox = {
   padding: '1rem',
   margin: '1rem'
 }
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#EFEFEF',
+    },
+    secondary: {
+      main: '#243A7E',
+    },
+  }
+});

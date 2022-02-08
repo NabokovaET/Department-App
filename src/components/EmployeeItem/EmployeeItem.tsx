@@ -1,10 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './EmployeeItem.scss';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Grid, Card, IconButton } from '@mui/material';
+import { Grid, Card, Fab, Menu, MenuItem } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EmployeeForm from '../EmployeeForm/EmployeeForm';
 
 const EmployeeItem = ({item}: {item: any}) => {
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [edit, setEdit] = useState(false);
+
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const deleteEmployeeCard = () => {
+    console.log('delete employee')
+  };
+
+  const editEmployeeCard = () => {
+    setEdit(!edit)
+  };
 
   const theme = createTheme({
     palette: {
@@ -20,24 +44,44 @@ const EmployeeItem = ({item}: {item: any}) => {
   return (
     <ThemeProvider theme={theme}>
       <Grid item xs={12} sm={11} md={4}>
-        <Card sx={styleCard}>
-          <Grid container>
-            <Grid item xs={12}>
-              <Grid container direction="row"  justifyContent="space-between" alignItems="center">
-                <h3>{item.firstName}</h3>
-                <IconButton color="inherit">
-                  <MoreVertIcon />
-                </IconButton>
+        {
+          edit
+          ? <EmployeeForm edit={edit} item={item} />
+          : <Card sx={styleCard}>
+              <Grid container>
+                <Grid item xs={12}>
+                  <Grid container direction="row" justifyContent="space-between" alignItems="center">
+                    <h3>{item.firstName}</h3>
+                    <Fab color="secondary" onClick={handleClick}>
+                      <MoreVertIcon />
+                    </Fab>
+                    <Menu
+                      anchorEl={anchorEl}
+                      open={open}
+                      onClose={handleClose}
+                    >
+                      <MenuItem onClick={handleClose}>
+                        <Fab color="secondary" onClick={() => setEdit(true)}>
+                          <EditIcon />
+                        </Fab>  
+                      </MenuItem>
+                      <MenuItem onClick={handleClose}>
+                        <Fab color="secondary" onClick={() => deleteEmployeeCard}>
+                          <DeleteIcon />
+                        </Fab>
+                      </MenuItem>
+                    </Menu>
+                  </Grid>
+                </Grid>
+                <Grid item xs={12}>
+                  <div>
+                      <p>{item.position}</p>
+                      <p>{item.email}</p>
+                  </div>
+                </Grid>
               </Grid>
-            </Grid>
-            <Grid item xs={12}>
-              <div>
-                  <p>{item.position}</p>
-                  <p>{item.email}</p>
-              </div>
-            </Grid>
-          </Grid>
-        </Card>
+            </Card>
+        }
       </Grid>
     </ThemeProvider>
   );

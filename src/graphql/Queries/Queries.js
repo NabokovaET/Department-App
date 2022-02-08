@@ -1,11 +1,24 @@
 import { gql } from "@apollo/client";
 
 export const GET_DEPARTMENT_LIST = gql`
-  query getDepartmentList($departmentId: String!) {
-    getDepartmentList(departmentId: $departmentId) {
+  query getDepartmentList {
+    departments {
       id
-      name
+      title
       description
+    }
+  }
+`;
+
+export const GET_EMPLOYEE_LIST = gql`
+  query getEmployeeList {
+    getEmployeeList {
+      id
+      firstName
+      lastName
+      email
+      age
+      posithion
     }
   }
 `;

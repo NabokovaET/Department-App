@@ -10,8 +10,6 @@ const Main = () => {
 
     const [add, setAdd] = useState<boolean>(false)
 
-    const list: any = data.list;
-
     const theme = createTheme({
         palette: {
           primary: {
@@ -20,7 +18,7 @@ const Main = () => {
         }
     });
 
-    const AddCard = () => {
+    const addDepartmentCard = () => {
         setAdd(!add)
     }
 
@@ -32,15 +30,14 @@ const Main = () => {
                     <Fab 
                         size="medium" 
                         color="primary" 
-                        aria-label="add" 
-                        onClick={AddCard}
+                        onClick={addDepartmentCard}
                     >
                         <AddIcon />
                     </Fab>
                 </div>
                 <DepartmentCardList 
-                    list={list}
                     add={add}
+                    addDepartmentCard={addDepartmentCard}
                 />
             </div>
         </ThemeProvider>
