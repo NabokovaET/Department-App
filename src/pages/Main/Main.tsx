@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import DepartmentCardList from '../../components/DepartmentCardList/DepartmentCardList';
 import './Main.scss';
-import data from "../../json/DepartmentCardList.json";
 import { Fab } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { createTheme, ThemeProvider } from '@mui/material/styles';

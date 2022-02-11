@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import './Department.scss';
 import EmployeeList from '../../components/EmployeeList/EmployeeList';
-import data from "../../json/EmployeeList.json";
 import { Fab } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import {useParams} from 'react-router-dom';
 
 const Department = () => {
 
-  const [add, setAdd] = useState<boolean>(false)
+  const {id, title} = useParams();
+  const idDepartment = Number(id);
 
-  const list: any = data.list;
-  const departmentName = "IT отдел";
+  const [add, setAdd] = useState<boolean>(false)
 
   const addEmployeeCard = () => {
     setAdd(!add)
@@ -29,7 +29,7 @@ const Department = () => {
     <ThemeProvider theme={theme}>
       <div className="Department">
         <div className="Department__header">
-          <h1>{departmentName}</h1>
+          <h1>{title}</h1>
           <Fab 
             size="medium" 
             color="primary" 
@@ -39,7 +39,7 @@ const Department = () => {
           </Fab>
         </div>
         <EmployeeList 
-          list={list}
+          idDepartment={idDepartment}
           add={add}
           addEmployeeCard={addEmployeeCard}
         />

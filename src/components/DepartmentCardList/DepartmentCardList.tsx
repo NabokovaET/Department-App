@@ -14,10 +14,9 @@ const DepartmentCardList = ({add, addDepartmentCard} : {add: boolean, addDepartm
   const { data, refetch } = useQuery(GET_DEPARTMENT_LIST);
   const [listDepartment, setlistDepartmentt] = useState<DepartmentInterface[]>([]);
   const [formValue, setFormValue] = useState({departmentName: '', description: ''});
-  const [ addDepartment, { data: newData } ] = useMutation(ADD_DEPARTMENT);
-  const [ deleteDepartment, { data: deleteData } ] = useMutation(DELETE_DEPARTMENT);
+  const [ addDepartment, { data: newData } ] = useMutation(ADD_DEPARTMENT, {refetchQueries: [GET_DEPARTMENT_LIST]});
+  const [ deleteDepartment, { data: deleteData } ] = useMutation(DELETE_DEPARTMENT, {refetchQueries: [GET_DEPARTMENT_LIST]});
 
-  console.log(listDepartment)
 
   useEffect(()=> {
     if(data) {
@@ -30,7 +29,6 @@ const DepartmentCardList = ({add, addDepartmentCard} : {add: boolean, addDepartm
       refetch();
     }
   })
-
 
   const handleChange = (e: any) => {
     setFormValue({

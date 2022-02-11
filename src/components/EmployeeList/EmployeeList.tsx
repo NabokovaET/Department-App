@@ -1,26 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Grid } from '@mui/material';
 import './EmployeeList.scss';
 import EmployeeItem from '../EmployeeItem/EmployeeItem';
-import { useQuery } from "@apollo/client";
 import { EmployeeInterface } from '../../interfaces/interfaces';
-import { GET_EMPLOYEE_LIST } from "../../graphql/Queries/Queries";
 import EmployeeForm from '../EmployeeForm/EmployeeForm';
+import { ADD_EMPLOYEE, DELETE_EMPLOYEE, UPDATE_EMPLOYEE } from "../../graphql/Mutation/Mutation";
+import { GET_DEPARTMENT } from "../../graphql/Queries/Queries";
+import { useQuery, useMutation } from "@apollo/client";
 
-const EmployeeList = ({list, add, addEmployeeCard} : {list: EmployeeInterface[], add: boolean, addEmployeeCard: Function}) => {
 
-  const { data, refetch } = useQuery(GET_EMPLOYEE_LIST);
-  const [listEmployee, setlistEmployee] = useState(list);
+const EmployeeList = ({idDepartment, add, addEmployeeCard} : 
+  {idDepartment: number, add: boolean, addEmployeeCard: Function}) => {
+  
+  const { data, refetch } = useQuery(GET_DEPARTMENT, {variables: { id: idDepartment }});
+  const [ listEmployee, setlistEmployee ] = useState<EmployeeInterface[]>([]);
+  const [ listPosition, setlistPosition ] = useState<any[]>([]);
+  const [ employeesQuantity, setEmployeesQuantity ] = useState();
+  const [ addEmployee, { data: addData } ] = useMutation(ADD_EMPLOYEE, {refetchQueries: [GET_DEPARTMENT]});
+  const [ deleteEmployee, { data: deleteData } ] = useMutation(DELETE_EMPLOYEE, {refetchQueries: [GET_DEPARTMENT]});
+  const [ updateEmployee, { data: updateData } ] = useMutation(UPDATE_EMPLOYEE, {refetchQueries: [GET_DEPARTMENT]});
 
-  if(data) {
-    setlistEmployee(data);
-  }
+  useEffect(()=> {
+    if(data) {
+      setlistEmployee(data.department.employees);
+      setlistPosition(data.department.positions);
+      setEmployeesQuantity(data.department.employeesQuantity);
+    }
+    if(addData) {
+      refetch();
+    }
+    if(deleteData) {
+      refetch();
+    }
+    if(updateData) {
+      refetch();
+    }
+  })
 
   const items = listEmployee.map((item) => {
     return (
       <EmployeeItem
         key={item.id}
         item={item}
+        deleteEmployee={deleteEmployee}
+        updateEmployee={updateEmployee}
+        positions={listPosition}
       />
     )
   });
@@ -34,7 +58,11 @@ const EmployeeList = ({list, add, addEmployeeCard} : {list: EmployeeInterface[],
                 <li className="EmployeeItem">
                   <EmployeeForm 
                     refetch={refetch}
+                    addEmployee={addEmployee}
                     addEmployeeCard={addEmployeeCard}
+                    positions={listPosition}
+                    employeesQuantity={employeesQuantity}
+                    idDepartment={idDepartment}
                   />
                 </li>              
               </Grid>

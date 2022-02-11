@@ -23,16 +23,16 @@ const DepartmentCard = ({item, deleteDepartment}: {item: any, deleteDepartment: 
         <ThemeProvider theme={theme}>
             <Grid item xs={12} md={6}>
                 <li className="DepartmentCard">
-                    <Link to={`/department/${item.id}`}>
+                    <Link to={`/department/${item.id}/${item.title}`}>
                         <Box sx={
-                            item.countEmployee
+                            item.employeesQuantity
                                 ? styleBox 
                                 : {...styleBox, border: '5px solid #F35F51'}
                         }>
                             <Grid container direction="row" justifyContent="space-between" alignItems="center">
                                 <h3>{item.title}</h3>
                                 {
-                                    !item.countEmployee
+                                    !item.employeesQuantity
                                     ?   <Fab 
                                             color="secondary"
                                             onClick={(e) => {
@@ -46,7 +46,7 @@ const DepartmentCard = ({item, deleteDepartment}: {item: any, deleteDepartment: 
                                 }
                             </Grid>
                             <p>{item.description}</p>
-                            <p>Количество сотрудников: {item.countEmployee}</p>
+                            <p>Количество сотрудников: {item.employeesQuantity}</p>
                         </Box>
                     </Link>
                 </li>

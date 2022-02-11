@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { Grid, Input, Box, Button} from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Grid, Input, Box, Button, Select, MenuItem, InputLabel, Fab} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { CREATE_POSITION } from "../../graphql/Mutation/Mutation";
 import { useMutation } from "@apollo/client";
-import { ADD_EMPLOYEE } from "../../graphql/Mutation/Mutation";
 
 const theme = createTheme({
   palette: {
@@ -15,49 +16,91 @@ const theme = createTheme({
   }
 });
 
-const EmployeeForm = ({refetch, addEmployeeCard, edit, item} : {refetch?: Function, addEmployeeCard?: Function, edit?: boolean, item?: any}) => {
+const EmployeeForm = ({refetch, addEmployee, addEmployeeCard, updateEmployee, setEdit, positions, edit, item, employeesQuantity, idDepartment} : 
+  {refetch?: Function, addEmployee?: Function, addEmployeeCard?: Function, updateEmployee?: Function, setEdit?: Function, positions?: any[], edit?: boolean, item?: any, employeesQuantity?: number, idDepartment?: number}) => {
 
-  const [formValue, setFormValue] = useState({firstName: '', lastName: '', email: '', age: '', position: ''});
-  const [ addEmployee, { data: newData } ] = useMutation(ADD_EMPLOYEE);
+  const formData = edit 
+    ? {...item, position: ''}
+    : {name: '', surname: '', email: '', age: '', position: ''} 
+
+
+  const [formValue, setFormValue] = useState(formData);
+  const [addPosition, setAddPosition] = useState(false);
+  const [newPosition, setNewPosition] = useState(positions);
+  const [ createPosition, { data: createPos } ] = useMutation(CREATE_POSITION);
+
+
+  useEffect(()=> {
+    if(createPos) {
+      setNewPosition(createPos);
+    }
+  })
+
+  const position = newPosition && newPosition.map((position) => {
+    return (
+      <MenuItem 
+        key={position.id}
+        value={position.id}
+      >
+        {position.title}
+      </MenuItem>
+    )
+  });
 
   const handleChange = (e: any) => {
     setFormValue({
       ...formValue, 
       [e.target.name]: e.target.value,
-    });
+    })
   }
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    setFormValue({firstName: '', lastName: '', email: '', age: '', position: ''})
-    
-    if (formValue) {
-      addEmployee({ 
+
+    if (edit && formValue) {
+      updateEmployee && updateEmployee({ 
         variables: { 
           input: { 
-            firstName: formValue.firstName, 
-            lastName: formValue.lastName,
+            id: item.id,
+            name: formValue.name, 
+            surname: formValue.surname,
             email: formValue.email, 
-            age: formValue.age,
-            posithion: formValue.position,
+            age: Number(formValue.age),
+            positionId: formValue.position,
           }, 
         }
-      });
-      refetch && refetch();
+      }).then(refetch);
+      setEdit && setEdit(false);
+    }
+  
+    if (!edit && formValue) {
+      addEmployee && addEmployee({ 
+        variables: { 
+          input: { 
+            name: formValue.name, 
+            surname: formValue.surname,
+            email: formValue.email, 
+            age: Number(formValue.age),
+            positionId: formValue.position,
+          }, 
+        }
+      }).then(refetch);
       addEmployeeCard && addEmployeeCard();
     }
-  }
-  console.log(item.firstName)
 
-  // if(edit) {
-  //   setFormValue({
-  //     firstName: item.firstName, 
-  //     lastName: item.lastName,
-  //     email: item.email, 
-  //     age: item.age,
-  //     position: item.position,
-  //   });
-  // }
+    if (addPosition && formValue) {
+      createPosition ({
+        variables: {
+          input: {
+            title: formValue.position,
+            departmentId: idDepartment
+          }
+        }
+      });
+      setAddPosition(false)
+    }
+
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -66,48 +109,74 @@ const EmployeeForm = ({refetch, addEmployeeCard, edit, item} : {refetch?: Functi
                 <Grid container direction='column'rowSpacing={3}>
                     <Grid item xs={12} md={6}>   
                       <Input 
-                        name='firstName'
+                        name='name'
                         placeholder="Имя сотрудника"
-                        value={edit ? item.firstName : formValue.firstName} 
+                        value={formValue.name} 
                         onChange={handleChange}
                         fullWidth={true}
                       />
                     </Grid>
                     <Grid item xs={12} md={6}>
                       <Input 
-                        name='lastName'
+                        name='surname'
                         placeholder="Фамилия сотрудника" 
-                        value={edit ? item.lastName : formValue.lastName} 
+                        value={formValue.surname} 
                         onChange={handleChange}
                         fullWidth={true}
                       />
                     </Grid>
                     <Grid item xs={12} md={6}>
                       <Input 
+                        type='email'
                         name='email'
                         placeholder="Email" 
-                        value={edit ? item.email : formValue.email} 
+                        value={formValue.email} 
                         onChange={handleChange}
                         fullWidth={true}
                       />
                     </Grid>
                     <Grid item xs={12} md={6}>
                       <Input 
+                        type='number'
                         name='age'
                         placeholder="Возраст" 
-                        value={edit ? item.age : formValue.age} 
+                        value={formValue.age} 
                         onChange={handleChange}
                         fullWidth={true}
                       />
                     </Grid>
                     <Grid item xs={12} md={6}>
-                      <Input 
-                        name='posithion'
-                        placeholder="Должность" 
-                        value={edit ? item.position : formValue.position} 
-                        onChange={handleChange}
-                        fullWidth={true}
-                      />
+                      <InputLabel>Должность</InputLabel>
+                      {
+                        !newPosition
+                          ? <Fab 
+                              size="medium" 
+                              color="primary" 
+                              onClick={() => setAddPosition(!addPosition)}
+                            >
+                              <AddIcon />
+                            </Fab>                          
+                          :  <Select
+                              name='position'
+                              label="Должность"
+                              value={formValue.position} 
+                              onChange={handleChange}
+                              fullWidth={true}
+                            >
+                              {position}
+                            </Select>
+                      }
+                      {
+                        addPosition
+                          ? <Input 
+                              type='position'
+                              name='position'
+                              value={formValue.position} 
+                              onChange={handleChange}
+                              fullWidth={true}
+                            />
+                          : null
+                      }
                     </Grid>
                     <Grid item xs={12} md={6} alignSelf="flex-end">
                       <Button 
@@ -115,8 +184,8 @@ const EmployeeForm = ({refetch, addEmployeeCard, edit, item} : {refetch?: Functi
                         variant="outlined" 
                         size="medium" 
                         color='primary'
-                        >
-                        Добавить
+                      >
+                        {edit ? 'Сохранить' : 'Добавить'}
                       </Button>
                     </Grid>
                 </Grid>

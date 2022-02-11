@@ -1,16 +1,26 @@
 
 export interface EmployeeInterface {
     id: string,
-    firstName: string,
-    lastName: string,
+    name: string,
+    surname: string,
     email: string,
     age: number,
-    position: string,
+    position: Position,
     department: string,
 }
 
 export interface DepartmentInterface {
     id: string,
-    name: string,
-    countEmployee: number,
+    title: string,
+    description: String,
+    positions: Position[],
+    employeesQuantity: number,
+}
+
+export interface Position {
+    id: string,
+    title: string,
+    description: string,
+    department: DepartmentInterface,
+    employees: EmployeeInterface[],
 }
